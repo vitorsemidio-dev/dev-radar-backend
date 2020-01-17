@@ -3,8 +3,19 @@ const axios = require('axios');
 const Dev = require('../models/Dev');
 
 class DevController {
+  async index(req, res) {
+    const devs = await Dev.find();
+    return res.json(devs);
+  }
+
   async store(req, res) {
     const { github_username, techs, latitude, longitude } = req.body;
+
+    const devExists = await Dev.findOne({ github_username });
+
+    if (devExists) {
+      return res.status(400).json({ error: 'User already exists' });
+    }
 
     const response = await axios.get(`https://api.github.com/users/${github_username}`);
 
